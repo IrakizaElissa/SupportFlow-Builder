@@ -6,4 +6,8 @@
 
   const renderer = new GraphRenderer(nodesContainer, svgEl, flowData);
   renderer.renderNodes();
+  renderer.enableEditing();
+
+  window._renderer = renderer; // expose for other modules
+  window._flowData = flowData;
 })();

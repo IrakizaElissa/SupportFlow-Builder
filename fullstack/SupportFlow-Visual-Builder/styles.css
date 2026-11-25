@@ -178,3 +178,13 @@ body {
 @keyframes dash-flow {
   to { stroke-dashoffset: -12; }
 }
+
+/* Editing state */
+.node-text[contenteditable="true"] {
+  outline: 1px dashed #FFD700;
+  border-radius: 4px;
+  padding: 2px 4px;
+  min-height: 20px;
+  cursor: text;
+}
+.node.selected .node-text { color: #fff; }

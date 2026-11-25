@@ -5,6 +5,8 @@ class GraphRenderer {
     this.nodesContainer = nodesContainer;
     this.svgEl = svgEl;
     this.flowData = flowData;
+    this.selectedNodeId = null;
+    this.onNodeEdit = null; // callback(nodeId, newText)
   }
 
   renderNodes() {
@@ -103,6 +105,60 @@ class GraphRenderer {
     const x = nodeEl.offsetLeft + nodeEl.offsetWidth / 2;
     const y = nodeEl.offsetTop;
     return { x, y };
+  }
+
+  enableEditing() {
+    this.nodesContainer.addEventListener('click', (e) => {
+      const nodeEl = e.target.closest('.node');
+      if (!nodeEl) {
+        // Click on empty canvas: deselect
+        this.deselectAll();
+        return;
+      }
+      // Avoid triggering edit if clicking an already-active contenteditable
+      if (e.target.classList.contains('node-text') && nodeEl.classList.contains('selected')) {
+        return;
+      }
+      this.selectNode(nodeEl.dataset.nodeId);
+    });
+  }
+
+  selectNode(nodeId) {
+    this.deselectAll();
+    this.selectedNodeId = nodeId;
+    const nodeEl = document.getElementById(`node-${nodeId}`);
+    if (!nodeEl) return;
+    nodeEl.classList.add('selected');
+    // Make node-text contenteditable
+    const textEl = nodeEl.querySelector('.node-text');
+    if (textEl) {
+      textEl.setAttribute('contenteditable', 'true');
+      textEl.focus();
+      // Place cursor at end
+      const range = document.createRange();
+      range.selectNodeContents(textEl);
+      range.collapse(false);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      // Listen for input changes
+      textEl.addEventListener('input', () => {
+        const node = this.flowData.nodes.find(n => n.id === nodeId);
+        if (node) {
+          node.text = textEl.textContent.trim();
+          if (this.onNodeEdit) this.onNodeEdit(nodeId, node.text);
+        }
+      }, { once: false });
+    }
+  }
+
+  deselectAll() {
+    document.querySelectorAll('.node.selected').forEach(el => {
+      el.classList.remove('selected');
+      const textEl = el.querySelector('.node-text');
+      if (textEl) textEl.removeAttribute('contenteditable');
+    });
+    this.selectedNodeId = null;
   }
 }
 
