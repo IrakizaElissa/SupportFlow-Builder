@@ -1,5 +1,7 @@
 # SupportFlow Visual Builder
 
+**Live Demo**: https://supportflowbuilder.vercel.app
+
 ## Overview
 
 A visual decision tree editor for chatbot flows, built with vanilla JavaScript — no flowchart libraries, no component frameworks. Demonstrates custom SVG/DOM rendering, in-place editing, graph traversal, and drag-and-drop interaction.
