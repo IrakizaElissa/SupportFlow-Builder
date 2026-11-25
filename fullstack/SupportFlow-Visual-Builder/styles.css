@@ -284,3 +284,15 @@ body {
 .chat-option-btn:hover { background: #2196F3; color: #fff; }
 .restart-btn { background: #333; border-color: #4CAF50; color: #4CAF50; }
 .restart-btn:hover { background: #4CAF50; color: #fff; }
+
+/* Graph traversal */
+.connection-path.visited { stroke: #4CAF50 !important; opacity: 0.5; }
+
+/* Breadcrumb */
+.chat-breadcrumb {
+  padding: 6px 16px; background: #16213e;
+  font-size: 11px; color: #aaa;
+  border-bottom: 1px solid #333;
+  min-height: 26px;
+}
+.crumb { color: #FFD700; font-weight: 600; }
