@@ -219,3 +219,33 @@ body {
 }
 #save-node-btn:hover { background: #1565C0; }
 .hidden { display: none !important; }
+
+/* Mode transition */
+#toolbar { transition: border-bottom-color 0.4s; }
+
+/* Preview overlay */
+#preview-overlay {
+  position: fixed; inset: 0;
+  background: rgba(10,10,20,0.85);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+#chat-container {
+  width: 420px; max-height: 80vh;
+  background: #0f3460; border-radius: 16px;
+  box-shadow: 0 16px 64px rgba(0,0,0,0.6);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+#chat-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 20px; background: #16213e;
+  border-bottom: 1px solid #333; font-weight: 600; font-size: 15px;
+}
+#close-preview-btn {
+  background: none; border: none; color: #aaa;
+  cursor: pointer; font-size: 13px;
+}
+#close-preview-btn:hover { color: #fff; }
