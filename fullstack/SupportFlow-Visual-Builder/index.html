@@ -29,6 +29,18 @@
                 <!-- Nodes container -->
                 <div id="nodes-container"></div>
             </div>
+
+            <!-- Properties Panel (shown when a node is selected) -->
+            <div id="properties-panel" class="hidden">
+              <div id="properties-header">
+                <span id="properties-node-type"></span>
+                <button id="properties-close-btn">✕</button>
+              </div>
+              <label for="properties-text-input">Node Text</label>
+              <textarea id="properties-text-input" rows="4" placeholder="Node question or message..."></textarea>
+              <div id="unsaved-indicator" class="hidden">● Unsaved changes</div>
+              <button id="save-node-btn">Apply Changes</button>
+            </div>
         </main>
 
         <!-- Preview/Chat overlay -->

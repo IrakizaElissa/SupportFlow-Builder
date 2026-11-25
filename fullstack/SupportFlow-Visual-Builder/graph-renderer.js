@@ -150,6 +150,40 @@ class GraphRenderer {
         }
       }, { once: false });
     }
+
+    // Update properties panel
+    const panel = document.getElementById('properties-panel');
+    const panelTypeEl = document.getElementById('properties-node-type');
+    const panelTextInput = document.getElementById('properties-text-input');
+    const unsavedIndicator = document.getElementById('unsaved-indicator');
+    const saveBtn = document.getElementById('save-node-btn');
+
+    if (panel) {
+      const node = this.flowData.nodes.find(n => n.id === nodeId);
+      if (!node) return;
+      panelTypeEl.textContent = node.type.toUpperCase() + ' Node';
+      panelTextInput.value = node.text;
+      unsavedIndicator.classList.add('hidden');
+      panel.classList.remove('hidden');
+
+      // Sync panel textarea -> canvas node text
+      panelTextInput.oninput = () => {
+        unsavedIndicator.classList.remove('hidden');
+      };
+      saveBtn.onclick = () => {
+        node.text = panelTextInput.value.trim();
+        // Update the contenteditable element on canvas
+        const canvasTextEl = document.getElementById(`node-${nodeId}`)?.querySelector('.node-text');
+        if (canvasTextEl) canvasTextEl.textContent = node.text;
+        unsavedIndicator.classList.add('hidden');
+        if (this.onNodeEdit) this.onNodeEdit(nodeId, node.text);
+      };
+
+      document.getElementById('properties-close-btn').onclick = () => {
+        panel.classList.add('hidden');
+        this.deselectAll();
+      };
+    }
   }
 
   deselectAll() {
@@ -159,6 +193,8 @@ class GraphRenderer {
       if (textEl) textEl.removeAttribute('contenteditable');
     });
     this.selectedNodeId = null;
+    const panel = document.getElementById('properties-panel');
+    if (panel) panel.classList.add('hidden');
   }
 }
 
