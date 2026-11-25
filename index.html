@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SupportFlow Visual Builder</title>
+    <!-- SupportFlow Visual Builder - Vanilla JS, no frameworks, no flowchart libraries -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Top toolbar -->
+        <header id="toolbar">
+            <div id="toolbar-left">
+                <span id="app-title">SupportFlow Builder</span>
+                <span id="mode-indicator">Editor Mode</span>
+                <button id="auto-layout-btn" title="Reset to auto layout">⚙ Auto Layout</button>
+            </div>
+            <div id="toolbar-right">
+                <button id="toggle-mode-btn" aria-label="Toggle preview mode">▶ Preview</button>
+            </div>
+        </header>
+
+        <!-- Main editor area -->
+        <main id="editor-area">
+            <!-- Canvas wrapper for pan/zoom -->
+            <div id="canvas-wrapper">
+                <!-- SVG layer for connection lines (renders beneath nodes) -->
+                <svg id="connections-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+                <!-- Nodes container -->
+                <div id="nodes-container"></div>
+            </div>
+
+            <!-- Properties Panel (shown when a node is selected) -->
+            <div id="properties-panel" class="hidden">
+              <div id="properties-header">
+                <span id="properties-node-type"></span>
+                <button id="properties-close-btn">✕</button>
+              </div>
+              <label for="properties-text-input">Node Text</label>
+              <textarea id="properties-text-input" rows="4" placeholder="Node question or message..."></textarea>
+              <div id="unsaved-indicator" class="hidden">● Unsaved changes</div>
+              <button id="save-node-btn">Apply Changes</button>
+            </div>
+        </main>
+
+        <!-- Preview/Chat overlay -->
+        <div id="preview-overlay" class="hidden">
+            <div id="chat-container">
+                <div id="chat-header">
+                    <span>Support Chat</span>
+                    <button id="close-preview-btn">✕ Exit Preview</button>
+                </div>
+                <div id="chat-messages"></div>
+                <div id="chat-options"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts loaded in dependency order -->
+    <script src="graph-renderer.js"></script>
+    <script src="chat-engine.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
