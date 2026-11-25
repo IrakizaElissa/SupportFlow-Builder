@@ -196,6 +196,133 @@ class GraphRenderer {
     const panel = document.getElementById('properties-panel');
     if (panel) panel.classList.add('hidden');
   }
+
+  enableDragAndDrop() {
+    this.nodesContainer.querySelectorAll('.node').forEach(nodeEl => {
+      this._makeDraggable(nodeEl);
+    });
+  }
+
+  _makeDraggable(nodeEl) {
+    let isDragging = false;
+    let startMouseX, startMouseY, startLeft, startTop;
+
+    nodeEl.addEventListener('mousedown', (e) => {
+      // Don't drag when clicking contenteditable text
+      if (e.target.getAttribute('contenteditable') === 'true') return;
+      isDragging = true;
+      startMouseX = e.clientX;
+      startMouseY = e.clientY;
+      startLeft = parseInt(nodeEl.style.left) || 0;
+      startTop = parseInt(nodeEl.style.top) || 0;
+      nodeEl.style.zIndex = '50';
+      nodeEl.style.cursor = 'grabbing';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - startMouseX;
+      const dy = e.clientY - startMouseY;
+      const newLeft = Math.max(0, startLeft + dx);
+      const newTop = Math.max(0, startTop + dy);
+      nodeEl.style.left = newLeft + 'px';
+      nodeEl.style.top = newTop + 'px';
+      // Update flow data position
+      const nodeId = nodeEl.dataset.nodeId;
+      const node = this.flowData.nodes.find(n => n.id === nodeId);
+      if (node) {
+        node.position.x = newLeft;
+        node.position.y = newTop;
+      }
+      // Redraw connections live
+      this.updateConnections();
+    });
+
+    document.addEventListener('mouseup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      nodeEl.style.zIndex = '';
+      nodeEl.style.cursor = '';
+      // Save layout to localStorage
+      this.saveLayout();
+    });
+  }
+
+  saveLayout() {
+    const layout = {};
+    this.flowData.nodes.forEach(n => {
+      layout[n.id] = { x: n.position.x, y: n.position.y };
+    });
+    localStorage.setItem('supportflow-layout', JSON.stringify(layout));
+  }
+
+  loadLayout() {
+    const saved = localStorage.getItem('supportflow-layout');
+    if (!saved) return false;
+    const layout = JSON.parse(saved);
+    this.flowData.nodes.forEach(n => {
+      if (layout[n.id]) {
+        n.position.x = layout[n.id].x;
+        n.position.y = layout[n.id].y;
+      }
+    });
+    return true;
+  }
+
+  autoLayout() {
+    // Hierarchical layout: BFS from start node
+    const startNode = this.flowData.nodes.find(n => n.type === 'start');
+    if (!startNode) return;
+
+    const visited = new Set();
+    const queue = [{ id: startNode.id, level: 0, siblingIndex: 0, siblingCount: 1 }];
+    const levelCounts = {};
+    const levelPositions = {};
+
+    // Count nodes per level
+    const tempQueue = [{ id: startNode.id, level: 0 }];
+    const tempVisited = new Set();
+    while (tempQueue.length) {
+      const { id, level } = tempQueue.shift();
+      if (tempVisited.has(id)) continue;
+      tempVisited.add(id);
+      levelCounts[level] = (levelCounts[level] || 0) + 1;
+      const node = this.flowData.nodes.find(n => n.id === id);
+      if (node) node.options.forEach(o => tempQueue.push({ id: o.nextId, level: level + 1 }));
+    }
+
+    // Assign positions
+    while (queue.length) {
+      const { id, level } = queue.shift();
+      if (visited.has(id)) continue;
+      visited.add(id);
+
+      levelPositions[level] = (levelPositions[level] || 0);
+      const count = levelCounts[level] || 1;
+      const totalWidth = this.flowData.meta?.canvas_size?.w || 1200;
+      const x = (totalWidth / (count + 1)) * (levelPositions[level] + 1) - 110;
+      const y = 60 + level * 220;
+
+      const node = this.flowData.nodes.find(n => n.id === id);
+      if (node) {
+        node.position.x = Math.max(10, x);
+        node.position.y = y;
+      }
+      levelPositions[level]++;
+
+      if (node) {
+        node.options.forEach(o => queue.push({ id: o.nextId, level: level + 1 }));
+      }
+    }
+
+    // Re-render
+    this.nodesContainer.innerHTML = '';
+    this.renderNodes();
+    this.enableEditing();
+    this.enableDragAndDrop();
+    localStorage.removeItem('supportflow-layout');
+  }
 }
 
 window.GraphRenderer = GraphRenderer;

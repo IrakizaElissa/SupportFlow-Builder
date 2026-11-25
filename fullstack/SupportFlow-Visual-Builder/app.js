@@ -12,6 +12,24 @@
   renderer.renderNodes();
   renderer.enableEditing();
 
+  // Load persisted layout if available
+  if (renderer.loadLayout()) {
+    // Update DOM positions from loaded layout
+    flowData.nodes.forEach(n => {
+      const el = document.getElementById(`node-${n.id}`);
+      if (el) {
+        el.style.left = n.position.x + 'px';
+        el.style.top = n.position.y + 'px';
+      }
+    });
+    renderer.updateConnections();
+  }
+  renderer.enableDragAndDrop();
+
+  document.getElementById('auto-layout-btn').addEventListener('click', () => {
+    renderer.autoLayout();
+  });
+
   window._renderer = renderer;
   window._flowData = flowData;
 
